@@ -1656,12 +1656,172 @@ val _ = op eqTypes : tyex list * tyex list -> bool
 (*                                                               *)
 (*****************************************************************)
 
+
 (* type checking for {\tuscheme} ((prototype)) 366 *)
-fun typeof _ = raise LeftAsExercise "typeof"
-fun typdef _ = raise LeftAsExercise "typdef"
+
+(* literal takes in a literal value and returns its type *)
+fun literal NIL = (FORALL (["'a"], listtype tvA))
+  | literal (BOOLV b) = booltype
+  | literal (NUM n) = inttype
+  | literal (SYM x) = symtype
+  | literal (PAIR (v1, NIL)) = raise LeftAsExercise ""
+  | literal (PAIR (v1, v2)) = raise LeftAsExercise ""
+  | literal (CLOSURE _) = raise TypeError ""
+  | literal (PRIMITIVE _) = raise TypeError ""
+  | literal (ARRAY _) = raise TypeError ""
+
+
+(* typeof takes in an expression and typing enviornment and returns the type *)
+(* of the expression *)
+fun typeof (e, gamma) = 
+    let
+        fun ty (LITERAL v) = literal v
+          | ty (VAR x) = find (x, gamma)
+          | ty (SET (x, e)) = 
+              let 
+                  val tx = find (x, gamma)
+                  val te = ty e
+              in
+                  if (eqType (tx, te)) then ty e
+                  else raise TypeError "Ill-typed SET"
+              end
+          | ty (IFX (e1, e2, e3)) = 
+              let
+                  val t1 = ty e1
+                  val t2 = ty e2
+                  val t3 = ty e3
+              in
+                  (* check condition is bool and branches are the same type *)
+                  if eqType(t1, booltype) then
+                      if eqType(t2, t3) then
+                          t3
+                      else
+                          raise TypeError "Ill-typed IF"
+                  else
+                      raise TypeError "Ill-typed IF"
+              end
+          | ty (WHILEX (e1, e2)) = 
+                let
+                    val t1 = ty e1
+                in
+                    if (eqType (t1, booltype)) then
+                        unittype
+                    else 
+                        raise TypeError "Ill-typed WHILE"
+                end
+          | ty (BEGIN []) = unittype
+          | ty (BEGIN es) = 
+                let
+                    val ts = map ty es
+                    val rev_ts = rev ts
+                in
+                    case rev_ts of
+                        (tn :: _) => tn
+                      | _ => raise TypeError "Ill-typed BEGIN"
+                end
+          | ty (APPLY (e, es)) = 
+                let
+                    val ts = map ty es
+                    val te = ty e
+                in
+                    case te of 
+                        FUNTY (param_ts, return_t) =>
+                            if eqTypes (param_ts, ts) then
+                                return_t
+                            else
+                                raise TypeError "Ill-typed APPLY"
+                      | _ => 
+                            raise TypeError "Ill-typed APPLY"
+                end
+          | ty (LETX (LET, bs, e)) = 
+                let
+                    val (xs, es) = ListPair.unzip bs
+                    val ts = map ty es
+                    val new_env = bindList (xs, ts, gamma)
+                    val return_t = typeof (e, new_env)
+                in
+                    return_t
+                end
+          | ty (LETX (LETSTAR, [], e)) = ty e
+          | ty (LETX (LETSTAR, b :: bs, e)) = 
+                                    ty (LETX (LET, [b], LETX (LETSTAR, bs, e)))
+          | ty (LETRECX (typedBs, e)) = 
+              let
+                  val (typedXs, es) = ListPair.unzip typedBs
+                  val (xs, txs) = ListPair.unzip typedXs
+                  val new_env = bindList (xs, txs, gamma)
+                  val tes = map (fn (e') => (typeof (e', new_env))) es
+                  val return_t = typeof (e, new_env)
+              in
+                  if (eqTypes (txs, tes)) then return_t
+                  else raise TypeError "Ill-typed LETREC"
+              end
+          | ty (LAMBDA (bs, e)) = 
+                let 
+                    val (xs, param_ts) = ListPair.unzip bs
+                    val new_env = bindList (xs, param_ts, gamma)
+                    val return_t = typeof (e, new_env)
+                in
+                    (FUNTY (param_ts, return_t))
+                end
+          | ty (TYLAMBDA (xs, e)) = 
+                let
+                    val te = ty e
+                    val ftv = freetyvarsGamma gamma
+                in
+                    if (List.all (fn (a) => (not (member a ftv))) xs) then
+                        (FORALL (xs, te))
+                    else
+                        raise TypeError "Ill-typed TYLAMBDA"
+                end
+          | ty (TYAPPLY (e, ts)) = 
+                let 
+                    val te = ty e
+                in
+                    case te of
+                        (FORALL (xs, t)) => instantiate (te, ts)
+                      | _ => raise TypeError "Ill-typed TYAPPLY"
+                end
+
+
+    in 
+        ty e
+    end
+
+(* typedef takes in a definition and typing enviornment and returns an *)
+(* updated typing enviornment and a string indicating ht etype of the *)
+(* defined name *)
+fun typdef (d, gamma) = 
+    case d of (VAL (x, e)) =>  
+                  let 
+                      val te = typeof (e, gamma)
+                      val new_env = bind (x, te, gamma)
+                  in (new_env, typeString te) end
+            | (VALREC (x, tx, e)) => 
+                  let 
+                      val new_env = bind (x, tx, gamma)
+                      val te = typeof (e, new_env)
+                  in 
+                      if (eqType (tx, te)) then (new_env, typeString te)
+                      else raise TypeError "Ill-typed VALREC"
+                  end
+            | (EXP e) => 
+                  let val t = typeof (e, gamma)
+                  in (bind ("it", t, gamma), typeString t) end
+            | (DEFINE (f, t, lambda_e)) => 
+                  let
+                      val (bs, _) = lambda_e
+                      val (_, txs) = ListPair.unzip bs
+                      val funty = (FUNTY (txs, t))
+                  in
+                      typdef ((VALREC (f, funty, (LAMBDA lambda_e))), gamma)
+                  end
+
 (* type declarations for consistency checking *)
 val _ = op typeof : exp * tyex env -> tyex
 val _ = op typdef : def * tyex env -> tyex env * string
+
+
 
 (*****************************************************************)
 (*                                                               *)
@@ -2613,7 +2773,7 @@ val primBasis =
         foldl addVal (types, values)
         []
 val primBasis = (kinds, types, values) (*OMIT*)      
-(* type declarations for consistency checking *)
+(* type declarations for consistency checking *) 
 val _ = op kinds     : kind      env
 val _ = op types     : tyex      env
 val _ = op values    : value ref env
@@ -2621,7 +2781,8 @@ val _ = op primBasis : basis
   in  (kinds, types, values)
   end
 val primitiveBasis = primBasis
-val predefs   =                                        
+val predefined_included = true 
+val predefs   = if not predefined_included then [] else                                     
                  [ ";  predefined {\\tuscheme} functions 359b "
                  , "(val list1 (type-lambda ['a] (lambda ([x : 'a])"
                  ,

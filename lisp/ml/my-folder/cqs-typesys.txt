@@ -46,22 +46,24 @@ sub-section).
     For each case, name the type-system rule that applies.  Each
     answer should be a rule name like Apply or GlobalAssign.
 
-      * The rule for case `| ty (AAT (a, i)) = ...` is:
-        
-
-      * The rule for case `| ty (APUT (a, i, e)) = ...` is:
+      * The rule for case `| ty (AAT (a, i)) = ...` is: ArrayAt
 
 
-      * The rule for case `| ty (AMAKE (len, init)) = ...` is:
+      * The rule for case `| ty (APUT (a, i, e)) = ...` is: ArrayPut
 
 
-      * The rule for case `| ty (ASIZE a) = ...` is:
+      * The rule for case `| ty (AMAKE (len, init)) = ...` is: MakeArray
+
+
+      * The rule for case `| ty (ASIZE a) = ...` is: ArraySize
 
 
     Now pick one of the rules and explain, in informal English, what
     the rule is supposed to do.
 
-      > ...your answer here...
+      > MakeArray: make-array(e1, e2) has type array of tau if e1 has type int 
+        and e2 has type tau.
+
 
     _This problem is getting you ready for Part A of the homework._
 
@@ -120,7 +122,7 @@ section:
         3. `((@ length sym) syms)`
         4. `((length sym) syms)`
 
-        > ...your answer here...
+        > ((@ length sym) syms)
 
 
     (b) You are given a function `positive?` of type `(int -> bool)`.
@@ -128,7 +130,7 @@ section:
         `(forall ('a 'b 'c) (('b -> 'c) ('a -> 'b) -> ('a -> 'c)))`,
         what code do you write to compose `positive?` with `not`?
 
-        >
+        > ((@ o int bool bool) not positive?)
 
     (c) In testing, we sometimes use a three-argument function `third`
         that ignores its first two arguments and returns its third
@@ -140,7 +142,10 @@ section:
         type) in Typed μScheme.  You will need to use both `type-lambda` and
         `lambda`.
 
-        >
+        > (val third
+            (type-lambda ('a 'b 'c)
+                (lambda ([x : 'a] [y : 'b] [z : 'c])
+                z)))
 
     _You are ready to start Part B of the homework._
 
@@ -160,24 +165,25 @@ Typed μScheme interpreter.
         ; (a)
         (if #t 1 #f)
 
-        >
+        > not well typed, rule If fails, two branches of If statement must have 
+          same type but first is int and second is bool
 
         ; (b)
         (let ([x 1]
               [y 2])
            (+ x y))
 
-        >
+        > Well typed, expression has type int
 
         ; (c)
         (lambda ([x : int]) x)
 
-        >
+        > Well typed, expression has type (int -> int)
 
         ; (d)
         (type-lambda ['a] (lambda ([x : 'a]) x))
 
-        >
+        > Well typed, expression has type (forall ['a] ('a -> 'a))
   
     _You are almost ready for Part C._
 
@@ -214,25 +220,22 @@ Typed μScheme interpreter.
 
     (a) To type-check IF(e1, e2, e3), we will use functions:
 
-        - <function-name>, to <do what?>
-        - <function-name>, to <do what?>
-        - ...
-        ...
+        - 'typeof', to recursively typecheck e1, e2, and e3
+        - 'eqType', to ensure e1 has type bool
+        - 'eqType', to ensure the types of e2 and e3 are equivalent
+
 
     (b) To type-check WHILE(e1, e2), we will use functions:
 
-        - <function-name>, to <do what?>
-        - <function-name>, to <do what?>
-        - ...
-        ...
+        - 'typeof', to recursively typecheck e1
+        - 'eqType', to ensure e1 has type bool
 
 
     (c) To type-check LETX (LET, binds, e), we will use functions: 
 
-        - <function-name>, to <do what?>
-        - <function-name>, to <do what?>
-        - ...
-        ...
+        - 'typeof', to recursively typecheck every e_i
+        - 'bind', to bind every x_i to the type of e_i
+        - 'typeof', to recursively typecheck e
 
 
 
