@@ -158,3 +158,4 @@
 
 (check-expect (tsort (graph-of-edge-list '((a b) (b c) (b e) (d e))))
              '(a b c d e))
+
