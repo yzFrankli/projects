@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<p id="demo1"></p>
+<p id="demo2"></p>
+<p id="demo3"></p>
+<p id="demo4"></p>
+<p id="demo5"></p>
+
+<script>
+function getPrice(number) {
+    if (number - Math.round(number) == 0) {
+        return (Math.round(number * 100) / 100) + ".00";
+    } else if ((Math.round(number * 10)) - Math.round(number) * 10 == 0) {
+        return (Math.round(number * 100) / 100) + "0";
+    } else if ((Math.round(number * 10)) - number * 10 == 0) {
+        return (Math.round(number * 100) / 100) + "0";
+    } else {
+        return (Math.round(number * 100) / 100);
+    }
+}
+var hotdog = 3.75;
+var fries = 3;
+var drinks = 2.5;
+let hotdogNum= prompt("How many hotdogs do you want to buy?");
+let friesNum = prompt("How many fries do you want to buy?");
+let drinksNum = prompt("How many drinks do you want to buy?");
+
+var subtotal = hotdogNum * hotdog + friesNum * fries + drinksNum * drinks;
+var discount = 0;
+if (subtotal >= 25) {
+    discount = subtotal * 0.1;
+}
+var tax = subtotal * 0.0625;
+document.getElementById("demo1").innerHTML = "Subtotal before discount: " + getPrice(subtotal);
+if (subtotal >= 25) {
+    document.getElementById("demo2").innerHTML = " discount applied: " + getPrice(discount);
+    document.getElementById("demo3").innerHTML = " Subtotal after discount: " + getPrice(subtotal - discount);
+}
+document.getElementById("demo4").innerHTML = " Tax: " + getPrice(tax);
+document.getElementById("demo5").innerHTML = " Final Subtotal: " + getPrice(subtotal-discount+tax);
+
+
+
+
+</script>
+</html>
