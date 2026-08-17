@@ -1,0 +1,4 @@
+* TrainThread controls train movement and logs MoveEvent.
+* PassThread controls boarding/deboarding and logs BoardEvent/DeboardEvent.
+* Station locks serialize access to shared state.
+* Lock ordering ensures no deadlock, and all state updates are synchronized.

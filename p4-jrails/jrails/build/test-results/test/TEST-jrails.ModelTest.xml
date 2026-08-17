@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="jrails.ModelTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-11-20T01:08:29.492Z" hostname="vm-hw07" time="0.244">
+  <properties/>
+  <testcase name="change" classname="jrails.ModelTest" time="0.212"/>
+  <testcase name="id" classname="jrails.ModelTest" time="0.0"/>
+  <testcase name="trySQLite" classname="jrails.ModelTest" time="0.031"/>
+  <system-out><![CDATA[executing change
+name = leo
+id = 1
+name = yui
+id = 2
+model id 0
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

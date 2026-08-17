@@ -1,0 +1,22 @@
+AI has been especially helpful to me during the implementation of the QuickCheck 
+component of my project. When I first started, I found it challenging to fully 
+\understand how to systematically generate test inputs from annotations like 
+@IntRange, @StringSet, @ListLength, and @ForAll. With AI’s guidance, 
+I was able to break the problem into smaller, manageable parts. It helped me reason 
+through how reflection works in Java—how to inspect method parameters, extract 
+annotations, and invoke methods dynamically.
+
+AI also helped me translate the project specification into concrete logic. For 
+example, I learned how to handle nested list annotations using recursive methods,
+ how to generate all possible argument combinations through Cartesian products,
+  and how to control the number of tests executed (up to 100). When I ran into 
+  compile-time or runtime errors, AI helped me debug step by step—pointing out 
+  small issues like incorrect casting, missing imports, or annotation-handling 
+  mistakes that were easy to overlook.
+
+Beyond just fixing errors, AI helped me understand why certain design decisions
+ were needed. It explained how unchecked exceptions differ from checked ones,
+ how invocation via reflection works, and how test cases are structured for 
+ automated grading. Overall, AI was like a mentor through the coding and
+  debugging process, helping me turn a complex specification into a working 
+  QuickCheck implementation that I fully understood.

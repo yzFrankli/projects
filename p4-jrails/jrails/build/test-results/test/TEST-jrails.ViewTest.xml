@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="jrails.ViewTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-11-20T01:08:29.738Z" hostname="vm-hw07" time="0.001">
+  <properties/>
+  <testcase name="linkTo" classname="jrails.ViewTest" time="0.0"/>
+  <testcase name="form" classname="jrails.ViewTest" time="0.0"/>
+  <testcase name="text" classname="jrails.ViewTest" time="0.001"/>
+  <testcase name="empty" classname="jrails.ViewTest" time="0.0"/>
+  <testcase name="paragraph" classname="jrails.ViewTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

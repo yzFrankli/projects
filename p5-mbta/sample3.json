@@ -1,0 +1,10 @@
+{
+    "lines": {
+        "LineA": [ "A", "B", "C" ],
+        "LineB": [ "E", "B", "C", "D" ]
+    },
+    "trips": {
+        "1SharedTrackEitherWorks": [ "C", "B" ],
+        "2SharedTrackEitherWorks": ["C", "B"]
+    }
+}

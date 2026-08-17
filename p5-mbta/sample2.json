@@ -1,0 +1,61 @@
+{
+  "lines": {
+    "red": [
+      "Oak Grove",
+      "Wellington",
+      "Assembly",
+      "Sullivan",
+      "North Station",
+      "Haymarket",
+      "State",
+      "Downtown Crossing",
+      "South Station"
+    ],
+    "green": [
+      "Medford/Tufts",
+      "Ball Square",
+      "Magoun Square",
+      "Gilman Square",
+      "East Somerville",
+      "Lechmere",
+      "North Station",
+      "Government Center",
+      "Park",
+      "Boylston"
+    ],
+    "blue": [
+      "Bowdoin",
+      "Government Center",
+      "Aquarium",
+      "Maverick",
+      "Airport",
+      "Wood Island",
+      "Orient Heights"
+    ]
+  },
+  "trips": {
+    "Alice": [
+      "Oak Grove",
+      "Haymarket",
+      "State",
+      "South Station"
+    ],
+    "Bob": [
+      "Lechmere",
+      "North Station",
+      "Park"
+    ],
+    "Claire": [
+      "Maverick",
+      "Aquarium",
+      "Government Center",
+      "Park"
+    ],
+    "Daniel": [
+      "Ball Square",
+      "Magoun Square",
+      "Lechmere",
+      "Government Center"
+    ]
+  }
+}
