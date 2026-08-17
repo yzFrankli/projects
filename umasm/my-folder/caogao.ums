@@ -1,0 +1,40 @@
+### Recrursive print fucntion for reference (prints in reverse order): 
+
+# print:
+#         push r1 on stack r2
+#         push r4 on stack r2    # save non-volatile register 
+#                                # (so we can do whatever in helper func)
+#         output ">>> "
+#         push r3 on stack r2    # Argument: current (latest) value on val stk
+#         goto print_stk linking r1
+#         pop r3 off stack r2
+#         output "\n"
+
+#         pop r4 off stack r2
+#         pop r5 off stack r2
+#         goto r5
+
+# print_stk:
+#         # print val stack using recursion
+#         push r1 on stack r2
+#         push r4 on stack r2
+        
+#         r4 := m[r0][r2 + 1]    # first parameter (curr location on val stack)
+
+#         if (r4 == endvalstack) goto print_stk_finish    # return if reached end of stack
+
+
+#         r5 := r4 + 1    # next parameter (next location on val stack)
+#         push r5 on stack r2
+#         goto print_stk linking r1
+#         pop stack r2
+
+#         push m[r0][r4] on stack r2
+#         goto printd linking r1
+#         output " "
+#         pop stack r2
+
+# print_stk_finish:
+#         pop r4 off stack r2
+#         pop r5 off stack r2
+#         goto r5

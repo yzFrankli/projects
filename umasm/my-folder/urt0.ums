@@ -1,0 +1,21 @@
+###############################################################
+#
+#                     urt0.ums
+#     Assignment: asmcoding
+#     Authors:    Rui Zhu, Frank Li
+#     Date:       Dec 8, 2025
+#
+#     Initializing code for calc40.
+#
+###############################################################
+
+.zero r0
+.temps r6,r7
+
+.section init
+        r0 := 0
+        r2 := endcalstack
+
+.section data
+        .space 10000    # call stack
+        endcalstack:    # call stack addr

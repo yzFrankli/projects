@@ -1,0 +1,17 @@
+###############################################################
+#
+#                     callmain.ums
+#     Assignment: asmcoding
+#     Authors:    Rui Zhu, Frank Li
+#     Date:       Dec 8, 2025
+#
+#     Calls the function main, used in calc40.
+#
+###############################################################
+
+.zero r0
+.temps r6,r7
+
+.section init
+        goto main linking r1
+        halt

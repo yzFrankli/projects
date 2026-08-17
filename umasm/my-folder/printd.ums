@@ -1,0 +1,87 @@
+###############################################################
+#
+#                     printd.ums
+#     Assignment: asmcoding
+#     Authors:    Rui Zhu, Frank Li
+#     Date:       Dec 8, 2025
+#
+#     The implementation for printd function, used in calc40.
+#
+###############################################################
+
+.zero r0
+.temps r6,r7
+
+.section text
+
+printd:
+
+        # prologue: save registers we will use
+
+        push r1 on stack r2
+        push r3 on stack r2
+        push r4 on stack r2
+        push r5 on stack r2
+
+        # stores the original num here
+        r5 := m[r0][r2 + 4]
+
+        r5 := r5 #r5 nand r5
+        # r3 is the counter
+        r3 := 0
+
+        # test if num is negative; add sign if so
+        if (r5 >=s 0) goto print_stk using r4
+
+        output "-"
+        r5 := -r5
+        output "negative input\n"
+
+print_stk:
+        # compute quotient (r4) and remainder (r5)
+        r4 := r5 / 10
+        # push r4 on stack r2
+        r5 := r5 mod 10
+        # pop r4 off stack r2
+
+div_loop:
+        # save remainder across recursive call
+        push r5 on stack r2
+
+        # print remainder if quotient is 0
+        if (r4 == 0) goto print_remainder using r1
+        r3 := r3 + 1    # increment coounter
+
+        # output "r4 != 0, input bigger than 9\n"
+
+        # set new num to quotient
+        r5 := r4
+        goto print_stk # use r6 as the return-address register for this recursive call
+
+        # (when recursion returns we continue here)
+        pop r5 off stack r2      # restore remainder
+
+print_remainder:
+        # r5 is the remainder (0..9) => convert to ASCII and output
+        if (r3 != 0) goto print_remainder_loop using r4
+        pop r5 off stack r2
+        r5 := r5 + 48
+        output r5
+        goto print_finish
+
+print_remainder_loop:
+        r3 := r3 - 1
+        pop r5 off stack r2
+        r5 := r5 + 48
+        output r5
+        goto print_remainder
+
+print_finish:
+        # epilogue: restore saved registers and return
+        pop r5 off stack r2
+        pop r4 off stack r2
+        pop r3 off stack r2
+        pop r1 off stack r2
+
+        # return to caller (r3 was the caller's link register)
+        goto r1

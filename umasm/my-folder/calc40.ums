@@ -1,0 +1,710 @@
+###############################################################
+#
+#                     calc40.ums
+#     Assignment: asmcoding
+#     Authors:    Rui Zhu, Frank Li
+#     Date:       Dec 8, 2025
+#
+#     The main implementation for calc40, an RPN calculator.
+#
+###############################################################
+
+
+### TODO ###
+
+# print does not work
+# End with ctrl+D does not work (ends in abort)
+
+############
+
+.zero r0
+.temps r6,r7
+
+
+.section data
+        .space 10000    # value stack (for RPN)
+        endvalstack:    # value stack addr
+
+.section rodata
+        jumptable: .space 256    # jumptable for general input
+        digit_jt:  .space 256    # jumptable for entering state
+
+.section init
+        r3 := endvalstack
+        goto jumptables_init linking r1
+
+.section text
+
+#
+# jumptables_init:
+#
+# Initialized jump tables jumptable and digit_jt
+#
+# Parameters: none
+#
+# Return: none
+#
+# Notable Register Usage:
+#       r1: Return Address
+#
+jumptables_init:
+        push r3 on stack r2
+        push r4 on stack r2
+        # init all as input_error (jumptable) or end_of_digits (digit_jt)
+        r3 := 0
+        goto jt_init_loop_test
+        jt_init_loop:
+                r4 := jumptable + r3
+                m[r0][r4] := input_error
+                r4 := digit_jt + r3
+                m[r0][r4] := end_of_digits
+                r3 := r3 + 1
+        jt_init_loop_test:
+                if (r3 != 256) goto jt_init_loop using r5
+        # overwrite 0 to 9 as digits
+        r3 := 48    # 48 = '0' in ascii9
+        goto jt_digit_loop_test
+        jt_digit_loop:
+                r4 := jumptable + r3
+                m[r0][r4] := digit
+                r4 := digit_jt + r3
+                m[r0][r4] := new_digit
+                r3 := r3 + 1
+        jt_digit_loop_test:
+                if (r3 != 58) goto jt_digit_loop using r5
+
+        # remaining commands: 
+        r4 := jumptable + ' '
+        m[r0][r4] := waiting
+
+        r4 := jumptable + '\n'
+        m[r0][r4] := print
+
+        r4 := jumptable + '+'
+        m[r0][r4] := add
+
+        r4 := jumptable + '-'
+        m[r0][r4] := sub
+
+        r4 := jumptable + '*'
+        m[r0][r4] := mul
+
+        r4 := jumptable + '/'
+        m[r0][r4] := div
+
+        r4 := jumptable + '|'
+        m[r0][r4] := bit_or
+
+        r4 := jumptable + '&'
+        m[r0][r4] := bit_and
+
+        r4 := jumptable + 'c'
+        m[r0][r4] := neg
+
+        r4 := jumptable + '~'
+        m[r0][r4] := bit_comp
+
+        r4 := jumptable + 's'
+        m[r0][r4] := swap
+
+        r4 := jumptable + 'd'
+        m[r0][r4] := dup
+
+        r4 := jumptable + 'p'
+        m[r0][r4] := pop_stk
+
+        r4 := jumptable + 'z'
+        m[r0][r4] := zero_stk
+        
+        pop r4 off stack r2
+        pop r3 off stack r2
+
+        goto r1
+
+#
+# main:
+#
+# runs calc40
+#
+# Parameters: none
+#
+# Return: EXIT_SUCESS
+#
+# Notable Register Usage:
+#       r1: Return Address & Return Value
+#       r3: Value Stack pointer
+#
+main:
+        # output "* in main\n"
+        push r1 on stack r2
+        push r3 on stack r2
+        push r4 on stack r2
+
+        # output "* going to run\n"
+        goto run linking r1
+        r1 := 0    # EXIT_SUCCESS
+
+        pop r4 off stack r2
+        pop r3 off stack r2
+        pop r5 off stack r2
+        goto r5
+
+#
+# run:
+#
+# runs the query loop for RPN calc
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       May change the value stack; may print to standard output
+#
+# Notable Register Usage:
+#       r1: Return Address
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will halt if reaches EOF; will produce error message on invalid input
+#
+run:
+        # output "* running\n"
+        push r1 on stack r2
+        push r3 on stack r2
+        push r4 on stack r2
+waiting:
+        # output "* waiting for input...\n"
+        r4 := input()
+        # output "* input is: "
+        # output r4
+        # output "\n"
+        if (r4 == -1) goto run_finish using r1
+waiting_with_character:
+        r5 := jumptable + r4
+        r5 := m[r0][r5]
+        # output "* jumping from input...\n"
+        goto r5
+digit:  # If r4 was a digit, r5 will redirect to here
+        r4 := r4 - '0'
+        push r4 on stack r3
+        # output "* pushed " 
+        # output r4 + '0'
+        # output " on val stk\n"
+        # output "\n"
+entering:
+        # output "* entering a digit...\n"
+        r4 := input()
+        # output "* input is: "
+        # output r4
+        # output "\n"
+        if (r4 == -1) goto run_finish using r1
+        r5 := digit_jt + r4
+        r5 := m[r0][r5]
+        goto r5
+        # r5 redirects to either of the following cases:
+        new_digit:
+                r4 := r4 - '0'
+                pop r5 off stack r3
+                r5 := r5 * 10
+                r5 := r5 + r4
+                push r5 on stack r3
+                # output "* appended "
+                # output r4 + '0'
+                # output " to number on val stk\n"
+                goto entering
+        end_of_digits:
+                # output "* end of digit\n"
+                goto waiting_with_character
+run_finish:
+        pop r4 off stack r2
+        pop r3 off stack r2
+        pop r1 off stack r2
+        goto r1
+
+#
+# input_error:
+#
+# Produces an error message on invalid input
+#
+# Parameters: none
+#
+# Return: none
+#
+# Notable Register Usage:
+#       r1: Return Address
+#       r4: Currently holds the input character
+#
+input_error:
+        output "Unknown character '"
+        output r4           # argument: the unknown input
+        output "'\n"
+        goto r1             # return
+
+
+#
+# print:
+#
+# Prints the stack in order of new to old values.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       May print to standard output
+#
+# Notable Register Usage:
+#       r1: Return Address
+#       r3: Value Stack pointer (saved) & Value Stack Iterator
+#
+print:
+        # output "** running print...\n"
+        push r3 on stack r2    # save val stack address
+        push r4 on stack r2
+
+        # r3 now acts as iterator
+        goto print_stk_loop_test
+        print_stk_loop:
+                output ">>> "
+
+                # output "(** val stk: "
+                # r1 := m[r0][r3] + '0'
+                # output r1
+                # output ") "
+        
+                push m[r0][r3] on stack r2
+                goto printd linking r1
+                pop stack r2
+
+                output "\n"
+                r3 := r3 + 1
+        print_stk_loop_test:
+                if (r3 != endvalstack) goto print_stk_loop using r5
+
+        # output "** finished printing\n"
+        pop r4 off stack r2
+        pop r3 off stack r2
+        goto waiting
+
+
+#
+# add:
+#
+# Pops the top two elems in value stack, x and y, then pushes x + y.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+add:
+        r5 := endvalstack - r3
+        if (r5 <s 2) goto error_underflow using r1
+
+        push r4 on stack r2
+
+        pop r5 off stack r3    # y
+        pop r4 off stack r3    # x
+        r4 := r4 + r5
+        push r4 on stack r3
+
+        pop r4 off stack r2
+        goto waiting
+
+
+#
+# sub:
+#
+# Pops the top two elems in value stack, x and y, then pushes x - y.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+sub:
+        r5 := endvalstack - r3
+        if (r5 <s 2) goto error_underflow using r1
+
+        push r4 on stack r2
+
+        pop r5 off stack r3    # y
+        pop r4 off stack r3    # x
+        r4 := r4 - r5
+        push r4 on stack r3
+
+        pop r4 off stack r2
+        goto waiting
+
+
+#
+# mul:
+#
+# Pops the top two elems in value stack, x and y, then pushes x * y.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+mul:
+        r5 := endvalstack - r3
+        if (r5 <s 2) goto error_underflow using r1
+        
+        push r4 on stack r2
+
+        pop r5 off stack r3    # y
+        pop r4 off stack r3    # x
+        r4 := r4 * r5
+        push r4 on stack r3
+
+        pop r4 off stack r2
+        goto waiting
+
+#
+# div:
+#
+# Pops the top two elems in value stack, x and y, then pushes x / y.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if dividing by 0, or stack underflows
+#
+div:
+        r5 := endvalstack - r3
+        if (r5 <s 2) goto error_underflow using r1
+        
+        push r4 on stack r2
+
+        pop r5 off stack r3    # y
+        pop r4 off stack r3    # x
+
+        if (r5 == 0) goto div_by_zero
+        if (r4 <s 0) goto div_neg_x using r1
+        if (r5 <s 0) goto div_neg_y using r1
+        
+        r4 := r4 / r5
+        push r4 on stack r3
+        goto div_finish
+
+div_by_zero:
+        output "Division by zero\n"
+        push r4 on stack r3
+        push r5 on stack r3
+        goto div_finish
+
+div_neg_x:
+        if (r5 <s 0) goto div_neg_both using r1
+        r4 := -r4
+        r4 := r4 / r5
+        r4 := -r4
+        push r4 on stack r3
+        goto div_finish
+
+div_neg_y:
+        r5 := -r5
+        r4 := r4 / r5
+        r4 := -r4
+        push r4 on stack r3
+        goto div_finish
+
+div_neg_both:
+        r4 := -r4
+        r5 := -r5
+        r4 := r4 / r5
+        push r4 on stack r3
+        goto div_finish
+
+div_finish:
+        pop r4 off stack r2
+        goto waiting
+
+#
+# bit_or:
+#
+# Pops the top two elems in value stack, x and y, then pushes x | y.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+bit_or:
+        r5 := endvalstack - r3
+        if (r5 <s 2) goto error_underflow using r1
+        
+        push r4 on stack r2
+
+        pop r5 off stack r3    # y
+        pop r4 off stack r3    # x
+        r4 := r4 | r5
+        push r4 on stack r3
+
+        pop r4 off stack r2
+        goto waiting
+
+#
+# bit_and:
+#
+# Pops the top two elems in value stack, x and y, then pushes x & y.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+bit_and:
+        r5 := endvalstack - r3
+        if (r5 <s 2) goto error_underflow using r1
+        
+        push r4 on stack r2
+
+        pop r5 off stack r3    # y
+        pop r4 off stack r3    # x
+        r4 := r4 & r5
+        push r4 on stack r3
+
+        pop r4 off stack r2
+        goto waiting
+
+#
+# neg:
+#
+# Pops the top elem in value stack, x, then pushes -x.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+neg:
+        r5 := endvalstack - r3
+        if (r5 <s 1) goto error_underflow using r1
+        
+        pop r5 off stack r3    # x
+        r5 := -r5
+        push r5 on stack r3
+        goto waiting
+
+#
+# bit_comp:
+#
+# Pops the top elem in value stack, x, then pushes ~x.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+bit_comp:
+        r5 := endvalstack - r3
+        if (r5 <s 1) goto error_underflow using r1
+        
+        pop r5 off stack r3    # x
+        r5 := ~r5
+        push r5 on stack r3
+        goto waiting
+
+#
+# swap:
+#
+# Swap the two values on top of the value stack.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+swap:
+        r5 := endvalstack - r3
+        if (r5 <s 2) goto error_underflow using r1
+        
+        push r4 on stack r2
+
+        pop r5 off stack r3    # x
+        pop r4 off stack r3    # y
+        push r5 on stack r3
+        push r4 on stack r3
+
+        pop r4 off stack r2
+        goto waiting
+
+#
+# dup:
+#
+# Duplicate the value on the top of the stack.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+dup:
+        r5 := endvalstack - r3
+        if (r5 <s 1) goto error_underflow using r1
+        
+        pop r5 off stack r3
+        push r5 on stack r3
+        push r5 on stack r3
+        goto waiting
+
+#
+# pop_stk:
+#
+# Pop a value off the value stack and discard it.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r3: Value Stack pointer
+#
+# Others:
+#       Will print error message if stack underflows
+#
+pop_stk:
+        r5 := endvalstack - r3
+        if (r5 <s 1) goto error_underflow using r1
+        
+        pop stack r3
+        goto waiting
+
+#
+# zero_stk:
+#
+# Remove all values from the value stack.
+#
+# Parameters: none
+#
+# Return: none
+#
+# Effect:
+#       Will change the value stack
+#
+# Notable Register Usage:
+#       r3: Value Stack pointer
+#
+zero_stk:
+        goto zero_stk_loop_test
+        zero_stk_loop:
+                pop stack r3
+        zero_stk_loop_test:
+                if (r3 != endvalstack) goto zero_stk_loop using r5
+        goto waiting
+
+#
+# error_underflow:
+#
+# Produces an error message on stack underflow
+#
+# Parameters: none
+#
+# Return: none
+#
+# Notable Register Usage:
+#       r1: Temporary register for goto
+#       r5: Currently holds the number of elements in the value stack.
+#
+error_underflow:
+        output "Stack underflow---expected at least "
+        if (r5 == 1) goto case_2 using r1
+        case_1: output "1 element\n"
+        case_2: output "2 elements\n"
+        goto waiting
