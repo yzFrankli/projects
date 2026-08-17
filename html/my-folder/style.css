@@ -1,0 +1,78 @@
+.header {
+    background-color: #3A483D;
+    text-align: center;
+    margin: -8px;
+    /* height: 30px; */
+    padding:10px;
+}
+
+.logo {
+    background: #EE8A50;
+    padding: 10px;
+    margin: -35px;
+    size: 40px;
+    /* position: sticky; */
+}
+.h1 {
+    margin:-21.440px;
+    float: inline;
+}
+.imgtxt {
+    top: 50%;
+    left: 50%;
+}
+.bg-text {
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0, 0.4);
+    color: white;
+    font-weight: bold;
+    border: 3px solid #f1f1f1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 80%;
+    padding: 20px;
+    text-align: center;
+}
+body {
+    background-color: #D8CEC3;
+}
+footer {
+    background-color: #3A483D;
+    padding: 30px;
+}
+div.story {
+    background-color: #3A483D;
+    padding: 60px;
+}
+* {
+  box-sizing: border-box;
+}
+/* Create three equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 50%;
+  padding: 15px;
+}
+
+/* Clear floats after the columns */
+.row::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+@media screen and (max-width:600px) {
+  .column {
+    width: 100%;
+  }
+}
+a:link {
+    color: white;
+}
+a:hover {
+   background-color:#EE8A50;
+}
