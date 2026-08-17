@@ -1,0 +1,92 @@
+;; step 3
+(check-principal-type 3 int)
+(check-principal-type #t bool)
+(check-principal-type 'hello sym)
+
+
+;; step 4
+(check-principal-type (if #t 1 2) int)
+(check-principal-type (if #f 'Richard 'Townsend) sym)
+(check-principal-type (if #t #f #t) bool)
+(check-type-error (if #t 'cs 105))
+(check-type-error (if #f #f 'cs))
+(check-type-error (if 0 #f 'cs))
+
+(check-principal-type (begin (begin (- 1 1) #t 'cs) (+ 1 4) #t) bool)
+(check-principal-type (begin 'cs #t (+ 1 4)) int)
+(check-type-error (begin #t (+ 1 #f) #f))
+
+(check-principal-type (lambda (x) (* x 2)) (int -> int))
+(check-principal-type (lambda (x) (+ x 1)) (int -> int))
+(check-principal-type (lambda (x y) (+ x y)) (int int -> int))
+(check-principal-type (lambda (a b c) (- (* a b) c)) (int int int -> int))
+(check-principal-type (lambda (x) x) (forall ['a] ('a -> 'a)))
+(check-type-error (lambda (x) (con x x)))
+
+
+;; step 5
+(check-principal-type (let* ([x 5] [y (+ x 5)]) (+ x y)) int)
+(check-principal-type (let ([x #t] [y #f]) (if x x y)) bool)
+(check-type-error (let ([x 5] [y #t]) (+ x y)))
+
+
+;; step 6
+
+(check-principal-type
+    (letrec 
+        ([len 
+            (lambda (xs) 
+                (if (null? xs)
+                    0
+                    (+ 1 (len (cdr xs)))))])
+        (len '(1 2 3)))
+    int)
+
+(check-principal-type '() (forall ['a] (list 'a)))
+(check-principal-type '(1 2 3) (list int))
+(check-principal-type '(#t #f) (list bool))
+(check-principal-type '(cs) (list sym))
+(check-type-error '(cs 105))
+(check-type-error '(cs 105 #t))
+
+
+;; step 8
+(check-principal-type (map (lambda (n) (+ n 1)) '(1 2 3)) (list int))
+(check-principal-type (map (lambda (n) (+ n 1)) '()) (list int))
+(check-principal-type (map (lambda (n) (< n 1)) '(1 2 3)) (list bool))
+(check-principal-type (map (lambda (n) (< n 1)) '()) (list bool))
+(check-principal-type (map (lambda (x) (if x 'cs 'ml)) '(#t #t #f)) (list sym))
+(check-principal-type (map (lambda (x) (if x 'cs 'ml)) '()) (list sym))
+
+(check-principal-type (filter (lambda (n) (< n 1)) '(1 2 3)) (list int))
+(check-principal-type (filter (lambda (n) (< n 1)) '()) (list int))
+(check-principal-type (filter (lambda (x) (= x 'cs)) '(Rich Ard)) (list sym))
+(check-principal-type (filter (lambda (x) (= x 'cs)) '()) (list sym))
+(check-principal-type (filter (lambda (b) b) '(#t #f)) (list bool))
+(check-principal-type (filter (lambda (b) b) '()) (list bool))
+
+(check-principal-type (exists? (lambda (n) (< n 1)) '(1 2 3)) bool)
+(check-principal-type (exists? (lambda (n) (< n 1)) '()) bool)
+(check-principal-type (exists? (lambda (x) (= x 'cs)) '(Rich Ard)) bool)
+(check-principal-type (exists? (lambda (x) (= x 'cs)) '()) bool)
+(check-principal-type (exists? (lambda (b) b) '(#t #t #f)) bool)
+(check-principal-type (exists? (lambda (b) b) '()) bool)
+
+(check-principal-type (foldr (lambda (a b) (+ a b)) 0 '(1 2 3)) int)
+(check-principal-type (foldr (lambda (a b) (+ a b)) 0 '()) int)
+(check-principal-type (foldr (lambda (a b) (= a b)) #t '(#t #t #t)) bool)
+(check-principal-type (foldr (lambda (a b) (= a b)) #t '()) bool)
+(check-principal-type (foldr (lambda (a b) (cons a b)) '() '(x y z)) (list sym))
+(check-principal-type (foldr (lambda (a b) (cons a b)) '() '())
+                                                        (forall ['a] (list 'a)))
+
+
+
+(check-principal-type (pair 1 2) (pair int int))
+
+(check-principal-type (pair 1 '(1 2 3)) (pair int (list int)))
+
+(check-principal-type (cons 1 '(1 2 3)) (list int))
+
+(check-principal-type (lambda (p) (fst p)) 
+                                        (forall ['a 'b] ((pair 'a 'b) -> 'a)))
