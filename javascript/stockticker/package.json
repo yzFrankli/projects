@@ -1,0 +1,22 @@
+{
+  "name": "stock-ticker-info",
+  "version": "1.0.0",
+  "description": "node app",
+  "main": "stock-ticker-info.js",
+  "scripts": {
+  "start": "node stock-ticker-info.js"
+  },
+  
+  "repository": {
+  "type": "git",
+  "url": ""
+  },
+
+  "authur": "",
+  "license": "ISC",
+  "bugs": {
+  "url": ""
+},
+  "homepage": ""
+  
+}
