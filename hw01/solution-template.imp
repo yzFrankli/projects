@@ -1,0 +1,159 @@
+;;;;;;;;;;;;;;;;;;; CS 105 IMPCORE ASSIGNMENT ;;;;;;;;;;;;;;;
+
+;; Your Name: yli57
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Problem 1
+
+
+;; (double-digit n) returns a nonnegative integer whose decimal representation 
+;; is the same as the decimal representation of integer n, except each digit 
+;; appears twice. n must be positive and less than 20,000.
+
+;; laws:
+;;   (double-digit d) == (* 11 d), where (< d 10)
+;;   (double-digit n) ==
+;;       (+ (* (double-digit (/ n 10)) 100)
+;;          (* 11 (mod n 10))), where (>= n 10)
+
+(define double-digit (n)
+  (if (< n 10)
+      (* 11 n)
+      (+ (* (double-digit (/ n 10)) 100)
+         (* 11 (mod n 10)))))
+
+(check-expect (double-digit 9) 99)
+(check-expect (double-digit 12) 1122)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Problem 2
+
+
+;; (population-count n) returns the number of 1 bits in the binary
+;; representation of integer n.
+
+;; laws:
+;;   (population-count 0) == 0
+;;   (population-count n) ==
+;;       (+ (mod n 2) (population-count (/ n 2))), where (> n 0)
+
+(define population-count (n)
+  (if (= n 0)
+      0
+      (+ (mod n 2)
+         (population-count (/ n 2)))))
+
+(check-expect (population-count 9) 2)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Problem 3
+
+
+;; (binary n) returns the binary representation of integer n.
+
+;; laws:
+;;   (binary 0) == 0
+;;   (binary n) ==
+;;       (+ (* (binary (/ n 2)) 10) (mod n 2)), where (> n 0)
+
+(define binary (n)
+  (if (= n 0)
+      0
+      (+ (* (binary (/ n 2)) 10)
+         (mod n 2))))
+
+(check-expect (binary 9) 1001)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Problem 4
+
+
+;; (sigma m n) returns the sum of the integers from m to n,
+;; where m is an integer and n is an integer greater than or
+;; equal to m. 
+
+;; laws:
+;;   (sigma m m) == m
+;;   (sigma m n) == (+ m (sigma (+ m 1) n)), where (< m n)
+
+(define sigma (m n)
+  (if (= m n)
+      m
+      (+ m (sigma (+ m 1) n))))
+
+(check-expect (sigma 9 9) 9)
+(check-expect (sigma 1 4) 10)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Problem 5
+
+
+;; (prime? n) returns 1 if n is prime and 0 otherwise, where n is a
+;; nonnegative integer.
+
+;; simple helper: checks divisibility starting at d
+
+(define has-divisor? (n d)
+  (if (= d n)
+      0
+      (if (= (mod n d) 0)
+          1
+          (has-divisor? n (+ d 1)))))
+
+;; laws:
+;;   (prime? 0) == 0
+;;   (prime? 1) == 0
+;;   (prime? n) == 1, where (> n 1) and (= (has-divisor? n 2) 0)
+;;   (prime? n) == 0, otherwise
+
+(define prime? (n)
+  (if (< n 2)
+      0
+      (if (= (has-divisor? n 2) 0)
+          1
+          0)))
+
+(check-expect (prime? 9) 0)
+(check-expect (prime? 13) 1)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Problem 6
+
+
+;; (nthprime n) returns the nth prime number, where n >= 1.
+
+;; this version just walks upward counting primes
+
+(define nthprime-helper (n count candidate)
+  (if (= count n)
+      (- candidate 1)
+      (if (= (prime? candidate) 1)
+          (nthprime-helper n (+ count 1) (+ candidate 1))
+          (nthprime-helper n count (+ candidate 1)))))
+
+;; laws:
+;;   (nthprime 1) == 2
+;;   (nthprime n) == next prime after (nthprime (- n 1)), where (> n 1)
+
+(define nthprime (n)
+  (nthprime-helper n 0 2))
+
+(check-expect (nthprime 1) 2)
+(check-expect (nthprime 5) 11)

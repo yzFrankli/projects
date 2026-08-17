@@ -1,0 +1,76 @@
+(define double-digit (n)
+  (if (< n 10)
+      (* 11 n)
+      (+ (* (double-digit (/ n 10)) 100)
+         (* 11 (mod n 10)))))
+
+(check-expect (double-digit 9) 99)
+(check-expect (double-digit 12) 1122)
+
+
+(define population-count (n)
+  (if (= n 0)
+      0
+      (+ (mod n 2)
+         (population-count (/ n 2)))))
+
+(check-expect (population-count 9) 2)
+
+
+(define binary (n)
+  (if (= n 0)
+      0
+      (+ (* (binary (/ n 2)) 10)
+         (mod n 2))))
+
+(check-expect (binary 9) 1001)
+
+
+(define sigma (m n)
+  (if (= m n)
+      m
+      (+ m (sigma (+ m 1) n))))
+
+(check-expect (sigma 9 9) 9)
+(check-expect (sigma 1 4) 10)
+
+(define has-divisor? (n d)
+  (if (= d n)
+      0
+      (if (= (mod n d) 0)
+          1
+          (has-divisor? n (+ d 1)))))
+
+;; laws:
+;;   (prime? 0) == 0
+;;   (prime? 1) == 0
+;;   (prime? n) == 1, where (> n 1) and (= (has-divisor? n 2) 0)
+;;   (prime? n) == 0, otherwise
+
+(define prime? (n)
+  (if (< n 2)
+      0
+      (if (= (has-divisor? n 2) 0)
+          1
+          0)))
+
+(check-expect (prime? 9) 0)
+(check-expect (prime? 13) 1)
+
+
+(define nthprime-helper (n count candidate)
+  (if (= count n)
+      (- candidate 1)
+      (if (= (prime? candidate) 1)
+          (nthprime-helper n (+ count 1) (+ candidate 1))
+          (nthprime-helper n count (+ candidate 1)))))
+
+;; laws:
+;;   (nthprime 1) == 2
+;;   (nthprime n) == next prime after (nthprime (- n 1)), where (> n 1)
+
+(define nthprime (n)
+  (nthprime-helper n 0 2))
+
+(check-expect (nthprime 1) 2)
+(check-expect (nthprime 5) 11)

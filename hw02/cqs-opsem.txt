@@ -1,0 +1,157 @@
+Reading comprehension for operational semantics
+=================================
+
+###  Instructions ###
+
+Edit this file, `cqs-opsem.txt`, to answer the questions below. There are
+markers indicating where you should write your answers for each question.
+
+If your editor is not good with Greek letters, you can spell out their
+names: ξ is $\xi$, ϕ is $\phi$, and ρ is $\rho$.
+
+Once you've edited the file, submit it by following the steps outlined on the
+homework spec.
+
+### Readings and Questions ###
+
+For questions 1--9, please read pages 28--37 in *Programming Languages: Build,
+Prove, and Compare* (the book sections on environments and on operational
+semantics of expressions). These questions are multiple-choice.
+
+ 1. $\xi$ (ξ) is an environment that maps names to
+
+    (a) *only* user-defined functions.
+    (b) *only* the values of formal parameters.
+    (c) *both* primitive and user-defined functions. 
+    (d) the values of *both* global variables and formal parameters.
+    (e) *only* primitive functions.
+    (f) *only* the values of global variables.
+
+    > (f)
+
+ 2. $\phi$ (ϕ) is an environment that maps names to
+
+    (a) *only* user-defined functions.
+    (b) *only* the values of formal parameters.
+    (c) *both* primitive and user-defined functions.
+    (d) the values of *both* global variables and formal parameters.
+    (e) *only* primitive functions.
+    (f) *only* the values of global variables.
+
+    > (b)
+
+ 3. $\rho$ (ρ) is an environment that maps names to
+
+    (a) *only* user-defined functions.
+    (b) *only* the values of formal parameters.
+    (c) *both* primitive and user-defined functions.
+    (d) the values of *both* global variables and formal parameters.
+    (e) *only* primitive functions.
+    (f) *only* the values of global variables.
+
+    > (c) 
+
+ 4. In the operational semantics, what kind of a thing does the
+    metavariable $e$ stand for?
+
+    (a) an environment
+    (b) an Impcore variable
+    (c) a function
+    (d) an expression
+    (e) a value
+
+    > (d)
+
+ 5. In the operational semantics, what kind of a thing does the
+    metavariable $v$ stand for?
+
+    (a) an environment
+    (b) an Impcore variable
+    (c) a function
+    (d) an expression
+    (e) a value
+
+    > (e)
+
+ 6. In the operational semantics, what kind of a thing does the
+    phrase "ρ{x ↦ 7}(x)" ($\rho\{x \mapsto 7\}(x)$) stand for?
+
+    (a) an environment
+    (b) an Impcore variable
+    (c) a function
+    (d) an expression
+    (e) a value
+
+    > (b)
+
+ 7. In the operational semantics, what kind of a thing does the
+    phrase "ρ{x ↦ 7}{x ↦ 8}" ($\rho\{x \mapsto 7\}\{x \mapsto 8\}$)
+    stand for?
+
+    (a) an environment
+    (b) an Impcore variable
+    (c) a function
+    (d) an expression
+    (e) a value
+
+    > (b)
+
+
+ 8. Between pages 28--37, how many distinct, named rules are written with the IF
+    syntactic form in the conclusion (don't use the rules written on page 78 to
+    answer this questions)? 
+
+    > 2 named rules: IFTRUE and IFFALSE
+
+ 9. Between pages 28--37, how many distinct, named rules are written with the
+    APPLY syntactic form in the conclusion (don't use page 78)?
+
+    > 5 rules: APPLYUSUER, APPLYADD, APPLYEQTRUE, APPLYEQFALSE, APPLYPRINTLN
+
+For question 10, please read pages 15--16 in *Programming Languages: Build,
+Prove, and Compare* (the book section on two varieties of syntax). Then review
+the WhileIterate rule on page 35.
+
+10. At the end of your reading on page 16, it is suggested that all the while
+    loops shown on page 15 could be represented with the same abstract syntax
+    WHILE(e, s). Why, then, does the WhileIterate rule on page 35 use abstract
+    syntax WHILE(e_1, e_2) instead of reusing WHILE(e, s)?
+
+    (a) The difference is arbitrary; all that matters is the WHILE tag.
+
+    (b) In Impcore, the condition and body of a while loop are both expressions,
+        unlike the while loop examples shown on page 15.
+
+    (c) The metavariable s and the metavariable e (with or without subscripts)
+        represent the same kind of thing, so these two pieces of abstract syntax
+        are equivalent.
+    (d) Impcore's abstract syntax requires that all metavariables have 
+        subscripts. 
+
+    > (b)
+
+Now let's understand a subtle point about rules. Study the FormalVar
+and FormalAssign rules starting on page 32.  In FormalVar, the initial
+and final states have the same $\rho$ (ρ).  But in the FormalAssign rule,
+there is an initial state with $\rho$ (ρ), an intermediate state with
+$\rho'$ (ρ'), and a final state with ρ'{x ↦ v} ($\rho'\{x \mapsto v\}$).
+Answer these questions:
+
+11. In rule FormalVar, the initial and final state have the same $\rho$ (ρ) 
+    because
+
+    (a) Evaluating $x$ might change the value of some formal parameter.
+    (b) Evaluating $x$ must change the value of any formal parameter.
+    (c) Evaluating $x$ doesn't change the value of any formal parameter.
+
+    > (c)
+      
+12. In rule FormalAssign, there is an intermediate state with $\rho'$ (ρ')
+    (rho-prime) because
+
+    (a) Evaluating $e$ might change the value of some formal parameter.
+    (b) Evaluating $e$ must change the value of any formal parameter.
+    (c) Evaluating $e$ doesn't change the value of any formal parameter.
+
+    > (a)
+

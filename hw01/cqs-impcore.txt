@@ -1,0 +1,226 @@
+Reading comprehension for Impcore
+=================================
+
+###  Instructions ###
+
+Edit this file, `cqs-impcore.txt`, to answer the questions below. There are
+markers indicating where you should write your answers for each question.
+
+Once you've edited the file, submit it by following the steps outlined on the
+homework spec.
+
+### Readings and Questions ###
+
+Please read pages 17--26 in *Programming Languages: Build, Prove, and Compare*.
+
+1.  What is the value of the following Impcore expression?
+
+        (if (> 3 5) 17 99)
+
+    > 99
+
+2.  Which of the following best describes the syntactic structure of
+    Impcore?
+
+    (a)   An expression can be made with any definition as one of its parts
+    (b)   A definition can be made with any expression as one of its parts
+    (c)   Both of the above
+    (d)   None of the above
+
+    > (c)
+
+3.  Does the following Impcore test pass? Please answer "yes" or "no."
+
+        (check-expect (+ 1 2 3) 6)
+
+    > no
+
+    Assuming `x` is bound to a global variable, does the following
+    Impcore test pass? Again, please answer "yes" or "no."
+
+        (check-expect (set x 1) 1)
+
+    > yes
+
+In *Seven Lessons in Program Design*, found on the course website, read the
+Introduction and Lesson 1.
+
+4.  I show you a recursive function `f` that takes one argument, 
+    a natural number `n`.  The structure of `n`, and therefore the
+    internal structure of `f`, are based on the Peano proof system from
+    the handout.
+
+    (a) What are the different ways `n` can be formed?
+
+    > Either 0, or the successor of a natural number (i.e., (+ 1 n'))
+    
+    (b) In the implementation of `f`, what Impcore code should `f` use to
+        test the form of `n`?
+
+    > (= n 0)
+    
+    (c) For which forms of `n` do you expect `f` to make a recursive call? This
+        should match one of the forms you provided in part (a).
+
+    > When n is a successor (i.e., not 0)
+
+    (d) When a recursive call is made, what value is passed as the argument?
+        Write this value as an Impcore expression.
+
+    > (- n 1)
+
+For problem 5, read the following explanation of ``mutual exclusion'' in
+algebraic laws.
+
+The end of the 7 lessons chapter goes over some common mistakes in algebraic
+laws, but there is another important aspect of laws that is often overlooked:
+``mutual exclusion.'' We say a function's algebraic laws are mutually
+exclusive if, for any possible input to the function, EXACTLY ONE LAW applies to
+that input. As an example, consider a function `sum-digits` that takes a natural
+number n as input, and returns the sum of the digits making up n's decimal
+form. For example, `(sum-digits 123)` == `(+ 1 (+ 2 (+ 3)))` and 
+`(sum-digits 3)` == `3`.  Here is a set of mutually exclusive laws for sum-digits 
+based on the  decimal numeration proof system:
+
+   (sum-digits d) == d
+   (sum-digits (+ (* m 10) d)) == (+ (sum-digits m) d)
+
+Here is an argument for the mutual exclusion of these laws: if the input natural
+number is a single digit, only the first law applies. If the input natural
+number has multiple digits, only the second law applies.  Since every natural
+number is either one digit long or multiple digits long, these laws cover every
+form of input, and exactly one law applies to any given input.
+
+The above argument seems to be faulty. Aren't `d` and `m` just variables?  How do we
+know that `d` can only be a single digit? And how do we know that `m` cannot be 0?
+If `m` can be 0, then the second law would also apply to single digit natural
+numbers (since the expresion `(+ (* 0 10) d)` is equal to `d`).  Here we will
+explain the 3 assumptions you can and cannot make while crafting laws to ensure
+correctness and mutual exclusion.
+
+(1) If you are crafting laws based on a given proof system, you MAY assume
+    that the variable names in that proof system have the same meaning in your laws.
+
+    *Example*: the `sum-digits` function's laws use the forms of input from the
+    decimal system for numeration, where `d` represents a single digit, and `m`
+    represents a natural number that isn't 0 (due to the premise `m /= 0` in
+    the DecNumeralNat rule). 
+
+(2) If your laws use variable names that aren't present in a given proof
+    system you MAY NOT assume what those variable names stand for.
+
+    *Example*: consider an almost identical set of laws for `sum-digits`, where
+    we just replaced every use of `d` with `n` in the first law:
+
+        (sum-digits n) == n
+        (sum-digits (+ (* m 10) d)) == (+ (sum-digits m) d)
+
+    Here, `n` is not a name used in the decimal numeration proof system, so we
+    cannot assume it stands for a single digit; instead we must assume it
+    could be any input value adhering to the function's contract (here, any
+    natural number). This slight name change means these laws are no longer
+    mutually exclusive! For example, an input of 12 matches the first law's
+    input (since `n` can be any natural number) and the second law's input
+    (since 12 is a multi-digit natural number)
+
+    This issue could be fixed by using the name 'd' instead of 'n', or by
+    imposing a side condition on the first law:
+
+        (sum-digits n) == n, where (< n 10)
+        (sum-digits (+ (* m 10) d)) == (+ (sum-digits m) d)
+
+    Now, the first law only applies to single digits!
+
+(3) Each law must be mutually exclusive from the other laws regardless of how
+    the laws are ordered. You MAY NOT assume that, if a given law matches the
+    input, then the laws above that one must not have matched.
+
+    *Example*: let's write laws for a weird version of `sum-digits`, which has
+    the same behavior as before except that the function outputs 42 if the input
+    happens to be the number 4:
+
+        (sum-digits 4) == 42
+        (sum-digits d) == d
+        (sum-digits (+ (* m 10) d)) == (+ (sum-digits m) d)
+
+    One might think that, if our input matches the second law (a single digit
+    `d`), then it must not have matched the first law. But that reasoning would
+    suggest that the meaning of algebraic laws depends on their ordering, which
+    is not true. An input of 4 matches the left-hand sides of multiple laws in
+    this case (the first and second), but those laws would produce different
+    results (42 for the first law, 4 for the second). Thus they are not mutually
+    exclusive. 
+
+    We can fix an issue like this with side-conditions that impose mutual
+    exclusivity:
+
+        (sum-digits 4) == 42
+        (sum-digits d) == d, when (not (= d 4))
+        (sum-digits (+ (* m 10) d)) == (+ (sum-digits m) d)
+
+    Now the 1st law only applies to an input of 4, the 2nd only applies to
+    single-digit inputs that are not the digit 4, and the 3rd only applies to
+    multi-digit natural numbers. This is true regardless of the order in which
+    the laws are written.
+
+5.  For each set of laws below, indicate whether that set is mutually exclusive, 
+    i.e., that ANY permissible input for that function will match EXACTLY ONE
+    law. Each of these function takes natural numbers as permissible inputs.
+
+    Please answer "yes" or "no" for each response. 
+    
+    Keep table 1.1 from *Seven Lessons in Program Design* handy, so you can
+    check if a set of laws seems to be aligned with a given proof system; if so,
+    then the use of the variable names in that proof system have more meaning
+    than arbitrary variable names.
+
+        (func1 n m) == 1, where (> m n)
+        (func1 n m) == 0
+
+    > no
+
+        (func2 0) == 7
+        (func2 (+ (* 2 m) b)) == (* (func2 m) b), where (not (= m 0))
+
+    > yes
+
+        (func3 d) == d, where (< d 10)
+        (func3 d) == (* (func3 (/ d 10)) (mod d 10)), where (= d 10)
+
+    > no
+
+        (func4 a) == a
+        (func4 (+ (* 10 c) e)) == (* (func4 c) e)
+
+    > no
+    
+Read the section titled "What is a contract?" in the Course Style Guidelines
+on the course website.
+
+6.  Suppose I write a contract for a `power` function that says, "this
+    function multiplies $x$ by itself $n$ times."  According to our
+    expectations, is this a good contract or a bad contract?
+    Please answer "good" or "bad."
+
+    > bad
+
+7.  In *Seven Lessons in Program Design*, just before the end of
+    Lesson 1, you will find a section on "Complete process examples."
+    This section suggests that the `factorial` function---but not the
+    `power` function---could be submitted without a contract.
+    
+    (a) Why would it be OK to submit the `factorial` function without
+        a contract?  For an idea, look at the "Exemplary" column in
+        the "Documentation" section of the general coding rubric.
+
+    > Because the name and standard mathematical meaning of factorial already 
+      make its purpose and behavior clear, so the function is self-documenting.
+
+    (b) Why doesn't the same argument apply to the `power` function?
+        For an idea, check the design lesson.
+
+    > Because “power” is ambiguous without a contract (e.g., which argument 
+      is the base, which is the exponent, and what inputs are allowed), 
+      so its behavior is not self-evident.
+
+You're all done!

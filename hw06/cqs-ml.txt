@@ -1,0 +1,231 @@
+Reading comprehension for ML
+============================
+
+###  Instructions ###
+
+Edit this file, `cqs-ml.txt`, to answer the questions below. There are
+markers indicating where you should write your answers for each question.
+Once you've edited the file, submit it by following the steps outlined on the
+homework spec.
+
+###  Questions  ###
+
+For question 1, read section 5.1 of
+[Harper](http://www.cs.cmu.edu/~rwh/isml/book.pdf) about tuple types and tuple
+patterns. Also look at the list examples in sections 9.1 and 9.2 of Harper.
+Some notes to keep in mind while reading:
+
+-- Harper writes out all his ML types for any variables defined in the code. For
+   example, `val pair : int * int = (2, 3)` is equivalent to writing 
+   `val pair = (2, 3)`, the former just makes the type of `pair` explicit 
+   (both as a form of documentation and as an additional method of making 
+   potential error messages more understandable).
+
+-- In 5.1.2, Harper claims that a pattern is one of three forms: a variable, a
+   tuple, or a wildcard. As seen in lecture, this isn't the whole story for ML
+   patterns in general (any datatype can be pattern matched against; you'll see
+   list patterns in 9.2), but those are the only three forms of patterns that
+   can exist when dealing with tuples and base types like int, bool, etc.
+
+-- In 9.2, Harper uses syntax that we haven't covered: local ... in ... end.
+   This is identical to let ... in ... end, except for what can replace the
+   second ...: in a let, it's an expression, while in a local, it's a
+   definition.  Harper is using this form to define a "local" function to only
+   be used in another function (the definition between "in" and "end").
+
+ 1. Consider the pattern `(x :: y :: zs, w)`. For each of the following
+    expressions, tell whether the pattern matches the value denoted. If
+    the pattern matches, say what values are bound to the four variables
+    `x`, `y`, `zs`, and `w`. If it does not match, explain why not.
+
+    (a) `([1, 2, 3], ("COMP", 105))`
+    (b) `(("COMP", 105), [1, 2, 3])`
+    (c) `([("COMP", 105)], (1, 2, 3))`
+    (d) `(["COMP", "105"], true)`
+    (e) `([true, false], 2.718281828)`
+
+    Answers here:
+
+    (a) matches
+        x: 1, y: 2, zs: 3, w: ("COMP", 105)
+
+    (b) does not match
+
+    (c) does not match
+
+    (d) matches
+        x: "COMP", y: "105", zs: [], w: true
+
+    (e) matches
+        x: true, y: false, zs: [], w: 2.718281828
+
+
+    _You are starting to be ready to use pattern matching._
+
+For question 2, read the descriptions of forms of data and example inputs (steps
+1 and 2) in the fourth "Lesson in Program Design." Look at Table 4.1, where each
+row tells you (from left-to-right) the type of an expression, the patterns it
+can be matched against (other than a variable or the wildcard pattern), how to
+write those patterns in a function definition, how to write them in an
+expression, and the types of the different parts of the pattern.
+
+ 2. Consider this expression:
+    
+        case f (x, y, z) 
+          of []      => raise Empty
+           | w :: ws => if p w then SOME w else NONE
+
+    You are told that the subexpression `f (x, y, z)` has type `'a list`.  
+    Using that information and Table 4.1, give the type of each of 
+    these code fragments, which are built from parts of patterns: 
+
+    (a) The type of the pattern `w :: ws`
+
+        → 'a list
+
+    (b) The type of the variable `ws`
+
+        → 'a list
+
+    (c) The type of the expression `SOME w`
+
+        → 'a option
+
+    _You are ready to use pattern matching on common ML types._
+
+For question 3, read the sections "Getting set up with the software" and 
+"ML's initial basis" in the homework spec. 
+
+ 3. Using one of the two techniques for "finding an initial basis function",
+    answer these three parts:
+
+    (a) What is the type of ML's `map` function (for lists)?
+
+        → ('a -> 'b) -> 'a list -> 'b list
+
+    (b) Is `curry` part of ML's initial basis? Answer "yes" or "no".
+
+        → no
+
+    (c) What is the name of the list reversal function in ML's initial basis? It
+    will have type `'a list -> 'a list`.
+
+        → rev
+
+    _You are ready to use ML's initial basis._
+
+
+For question 4, read the section on unit testing in the homework spec. Then read
+about infix function names in step 3 of the fourth "Lesson in Program Design."
+
+ 4. Using the mosml interpreter to be sure your answer is well typed (see the
+    homework spec to learn how to invoke the interpreter properly),
+    translate the following _failing_ uscheme unit test into an equivalent
+    _failing_ ML unit test:
+    
+        (check-expect (foldl + 0 '(1 2 3)) 7)
+    
+    Your translation:
+
+    → val () = 
+        Unit.checkExpectWith Unit.intString "foldl + 0 [1, 2, 3] should be 7"
+        (fn () => List.foldl (op +) 0 [1, 2, 3])
+        7
+
+    _You are ready to write unit tests._
+
+For question 5, read the definition of function `bindList` in code chunk 305e of
+*Programming Languages: Build, Prove, and Compare*.
+
+Consider `bindList`'s type, which is presented in a box above its definition.
+Some parts of it should be familiar: `*` for a tuple type, `->` for a function
+type, a type variable `'a`, and the `list` type constructor.  But what is the
+`name` type? And what's an `env`? 
+
+These are both examples of "type synonyms", i.e., new names for existing types.
+These are identical to "typedefs" in C and C++: we give a new name for an
+existing type to better describe its purpose. To represent variable names within
+the uScheme interpreter, we use ML's string type:
+
+    type name = string
+
+After the preceding line is executed, we can use `name` instead of `string`
+whenever we want to make it clear that a string is being used as the name of a
+variable being interpreted. To build a value of this new type, just build a
+value of the old type; here's a value of type `name` that represents a uScheme
+variable called "hello":
+
+    (* var_name : name *)
+    val var_name = "hello"
+
+We can also rename polymorphic types. To represent an arbitrary environment, we
+define a new polymorphic `env` type that maps names to some other type in a
+list:
+
+    type 'a env = (name * 'a) list
+
+Anytime you see an unfamiliar type, get in the habit of looking its definition
+up in the interpreter to see if it's a type synonym (defined with `type`) or an
+algebraic data type (defined with `datatype`).
+
+ 5. (a) Write an ML value that has type `int env`, but is not identical to
+        `emptyEnv`, which is defined in code chunk 305a.
+
+        → [("x", 10), ("y", 20)]
+
+    (b) Show a call to `bindList` that is well typed (passes type checking)
+        but whose evaluation raises the `BindListLength` exception:
+    
+        → bindList (["x", "y"], [1], emptyEnv)
+    
+        (Hint: keep things simple by passing `emptyEnv` as the third argument,
+        which is defined in code chunk 305a.)
+
+    _You are ready to explore the types introduced in the uScheme interpreter, 
+    and to write `zip` and other functions that use exceptions._
+
+For question 6, read about free variables in the 2nd and 3rd paragraphs of
+section 5.6 of *Programming Languages: Build, Prove, and Compare* (from "When an
+expression e refers to a name y..." to "...and the names map, f, and xs are
+bound."). That's all you need to read to answer the following question, but you
+will eventually need to read/understand the inference rules on pages 316-317 to
+complete the last homework problem. Feel free to read them now or save them as
+reference for the problem.
+
+ 6. "Free" variables are those that are not bound to a value in the current
+    scope. Identify the free variables of the uScheme expressions below.
+    *Remember that a name occurring in function position can be a free
+    variable.* 
+    
+    You might be wondering, "Why are we talking about uScheme here?" You will be
+    writing ML code in this assignment that interprets uScheme code, so it's
+    helpful to work through some examples so you know what your code will have
+    to consider.
+
+     (a) Free variables of `(lambda (x) (lambda (y) (equal? x y)))`
+
+         → equal? 
+         since x is bounded by outer and y by the inner lambda, equal? must 
+         come from the global environment
+
+     (b) Free variables of `(lambda (y) (equal? x y))`
+
+         → x, equal?
+         Since y is bounded by the previous lambda, equal? and x are used
+         but never defined which makes them free variables.
+
+     (c) Free variables of
+
+             (lambda (s1 s2)
+               (if (or (atom? s1) (atom? s2))
+                 (= s1 s2)
+                 (and (equal? (car s1) (car s2))
+                      (equal? (cdr s1) (cdr s2)))))
+
+         → or, atom?, =, and, equal?, car, cdr
+         only s1 and s2 are defined for the lambda so the rest must be defined
+         elsewhere.
+
+    _You are ready to improve the μScheme interpreter._ You will be turning
+    your answers to parts (a) and (b) into unit tests in the homework.
+

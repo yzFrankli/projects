@@ -1,0 +1,8 @@
+(val x
+  (begin
+    (define f ()
+      (begin
+        (set y 1)
+        0))
+    (f)
+    y))

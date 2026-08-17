@@ -1,0 +1,379 @@
+Reading comprehension for Type Inference
+=========================================
+
+###  Instructions ###
+
+Edit this file, `cqs-inference.txt`, to answer the questions below. There are
+markers indicating where you should write your answers for each question.
+Once you've edited the file, submit it by following the steps outlined on the
+homework spec.
+
+###  Questions  ###
+
+For question 1, read the intro to section 7.4 and read section 7.4.1 about
+the components of nano-ML's type system. 
+
+ 1. We have seen the symbols ρ, τ, and σ before, but not used exactly in
+    this way. 
+
+    Here is a list of semantic and type-related concepts you have seen
+    written using single symbols:
+
+      - an expression
+      - a name
+      - a location
+      - a value
+      - a type
+      - a type scheme (new in this chapter)
+      - a mapping from names to locations
+      - a mapping from names to values
+      - a mapping from names to types
+      - a mapping from names to type schemes (new in this chapter)
+
+    There are lots of concepts and only so many symbols to go around.
+    Please identify, from the preceding list, what each symbol stands
+    for in the theory of nano-ML:
+
+    (a) τ
+
+    > ...your answer here...
+
+    (b) σ
+    
+    > 
+
+    (c) Γ
+    
+    > 
+
+    And finally, 
+
+    (d) Say briefly what, in nano-ML, is the difference between τ and σ:
+
+    > 
+
+    _You are preparing for exercise 3._
+
+
+For question 2, first read the first two paragraphs of section 7.4.3 (stopping
+at "A substitution is a finite map...") about automatic instantiation.  These
+paragraphs introduce the notion of a substitution, which we represent
+mathematically with a "theta" $θ$. Next, read the rest of the text here in the
+CQs file to learn more about substitutions and instantiations.
+
+Richard thinks a substitution is best understood as a mapping or function from
+some set of type variables to a set of types. Since a substitution is a
+function, it can be composed with other substitutions to produce a new one. Here
+are two different substitution examples, the first mapping a type variable
+α to the type "int", the second composing two substitutions together (one
+that maps type variable α to type variable β, another mapping type
+variable β to type "bool"):
+
+  $θ1$ = `(α → int)`
+
+  $θ2$ = `(α → β) ∘ (β → bool)`
+
+A substitution can be 'applied' to anything involving types (e.g., a type, a
+type scheme, a type-equality constraint), and doing so replaces any type
+variables in the domain of the substitution with their corresponding types. For
+example, applying $θ2$ to some type "tau" would first replace any β in
+"tau" with "bool" (giving "tau-prime"), then it would replace any α in
+"tau-prime" with β.
+
+We can use this notion to formalize the idea of a type "instance". Specifically,
+given two types τ and τ', we say that τ' is an "instance" of τ if there is some
+substitution θ such that τ' = θ(τ). For example, "int" is an instance of type
+variable α, because substitution $θ1$ above can be applied to α to yield the
+type "int". "bool" is also an instance of type variable α, because we could make
+some other substitution that maps α to type "bool".
+
+We can extend this instance relation to type schemes. We say that type τ' is an
+instance of type scheme ∀ α1,...,αn.τ  if there's some substitution θ such that
+τ' = θ(τ) AND θ only maps a subset of the type variables {α1, ..., αn}. In other
+words, the substitution θ is only allowed to map type variables that are bound
+by the ∀. Finding such a substitution and applying it to the polymorphic type
+scheme to obtain a monomorphic type is called "instantiating" the polymorphic
+type scheme.  When we instantiate a type scheme, we may substitute for the type
+variables mentioned by the ∀ *and only for those variables.* This is like
+instantiation in Typed uScheme (e.g., [@ cons int]), except in nano-ML the type
+system instantiates each type scheme automatically without programmer
+assistance!
+
+
+ 2. (a) Yes or no: does the substitution `(α → sym) ∘ (β → bool) ∘ (γ → int)`
+        replace type variable `α` with type `sym`?
+
+        >
+
+    (b) Yes or no: does the substitution `(α → sym) ∘ (β → bool) ∘ (γ → int)`
+        replace type variable `β` with type `bool`?
+
+        >
+
+    (c) Yes or no: does the substitution `(α → sym) ∘ (β → bool) ∘ (γ → int)`
+        leave the type `γ list` unchanged?
+
+        >
+
+    (d) Which of the following nano-ML type expressions, written in concrete
+        nano-ML syntax, are *instances* of the polymorphic type scheme 
+        `∀α . α list → int`?  
+        
+        For each one, please indicate whether it is an instance of the type
+        scheme (True) or whether it is not an instance of the type scheme
+        (False). 
+        
+        `(list int)`   True or False
+
+        >
+
+        `(list (list int))`  True or False
+
+        >
+
+        `((list (list int)) -> int)`  True or False
+
+        >
+
+        `((list int) int -> list)`  True or False
+
+        >
+
+    _You have a foundation on which to build for exercise 2._
+
+For questions 3-4, read the first two pages of section 7.5.2 about the form of
+constraints and how they can be used to write deterministic typing judgements
+for IF and APPLY expressions in nano-ML. Then read all of section 7.5.3, which
+explains how to solve constraints by finding substitutions.
+
+ 3. Consider the following substitution θ and constraint $C$:
+
+    > $θ$ = `(α₁ ↦ int)`
+    >
+    > $C$ = `α₁ ~ α₂ /\ α₂ ~ α₃ list /\ α₄ ~ α₃ list list`.
+
+    Now define $C' = θ(C)$.
+    
+    (a) Write $C'$:
+
+    >
+    
+    (b) Does $C'$ have a solution?  Answer yes or no.
+
+    >
+
+    Now define $C''$ as the result of applying substitution `(α₂ ↦ int)` to $C$.
+
+    (c) Write $C''$:
+    
+    >
+
+    (d) Does $C''$ have a solution?  Answer yes or no.
+
+    >
+    
+
+    _You are getting ready for exercise 2._
+
+
+
+ 4. To demonstrate your understanding on how to solve constraints,
+    reason about solving these four constraints:
+
+    > `C₁ = α ~ int`
+    >
+    > `C₂ = α ~ bool`
+    >
+    > `C₃ = C₁ /\ C₂`
+    >
+    > `C₄ = α₁ ~ α₂ /\ α₂ list ~ α₁`
+
+    (a) Write a substitution `θ₁` that solves constraint `C₁`:
+       
+    >
+
+
+    (b) Write a substitution `θ₂` that solves constraint `C₂`:
+
+    >
+
+
+    (c) Does the composition `θ₂ ∘ θ₁` solve constraint `C₃ = C₁ /\ C₂`?
+        Answer yes or no.
+
+    >
+
+
+    (d) Can constraint `C₃` be solved? Answer yes or no.
+
+    >
+
+
+    (e) Can constraint `C₄` be solved? Answer yes or no.
+
+
+    >
+
+
+    _You are ready for exercise 2._
+
+The readings done so far have told you the components of nano-ML's type system
+(7.4.1), substitutions and instances, constraints and how they're generated in
+some nano-ML typing rules (7.5.2), and how to solve constraints by finding
+substitutions. But how are these ideas combined in a full-fledged type inference
+algorithm?
+
+At a high level, the type inference algorithm implements the typing judgement
+C, Γ ⊢ e : τ.  That is, given a mapping from names to polymorphic type schemes
+(Γ) and an expression to type check (e) as inputs, the algorithm produces a
+monomorphic type τ and a constraint C as outputs. If constraint C is satisfied
+(i.e., if we can find a substitution that solves it), then expression e has type
+τ. Most expressions produce "interesting" constraints when they're type checked,
+but any with a "known" type (e.g., literals of monomorphic type or variables
+whose names are already present in Γ) just produce the trivial constraint `T`.
+
+As an example, consider type inference for expression (+ 3 2) with a type
+environment Γ = { + : `∀.int × int -> int }. According to the APPLY rule on page
+421, we have to first type check sub-expressions `+`, `3`, and `2`.  I'll first
+type check sub-expressions `3` and `2`, which in each case produces the type
+'int' and the trivial constraint `T` (since numeric literals always have type
+'int'). Formally, we have `T, Γ ⊢ 3, int` and `T, Γ ⊢ 4, int`. 
+
+For type checking `+`, note that it's already bound to a type scheme in Γ; thus
+type checking it will just produce the trivial constraint `T`. But what type
+will be output for `+`? Recall that type inference has to produce both a
+constraint and a type, but Γ maps names to type _schemes_ that use `∀`, which
+aren't types. So how do we go from the schemes in Γ to the types we want? This
+is where _instantiation_ comes into play. If a name is _used_ in the code (like
+`+` in this example), its type scheme ∀ α1,...,αn.τ gets instantiated by (1)
+substituting some subset of the type variables {α1,...,αn} in τ with fresh type
+variables that haven't been used anywhere else and (2) removing the ∀ and its
+associated type variables. If a type scheme has an empty ∀ (i.e., that symbol is
+immediately followed by a dot), then instantiating is easy: just remove the ∀
+and you have your type! So instantiating the type scheme for `+` gives us type
+`int × int -> int` (I just removed the `∀.`). Formally, we have 
+
+  `T, Γ ⊢  +, int × int -> int`
+
+Taken together in the APPLY rule, we can derive the following (with
+unnecessary parentheses added around the constraints imposed by the APPLY
+rule to help read it):
+
+T /\ T /\ T, Γ ⊢ `+`, 3, 2 : int × int -> int, int, int   'a is fresh
+----------------------------------------------------------------------
+T /\ T /\ T /\ (int × int -> int) ~ (int × int -> 'a), Γ ⊢ (+ 3 2) : 'a
+
+In this case, the big conjunction in the conclusion and the type 'a would be the
+outputs of type inference for expression (+ 3 2).
+
+ 5. Now consider type inference for the following expression e:
+    
+        (f 3 #t)
+        
+    For this question, assume the following:
+
+      - Expression `3` has type `int`, with a trivial constraint.
+      - Expression `#t` has type `bool`, with a trivial constraint.
+      - Trivial constraints can be ignored.
+      - Every type variable *except* `'a`, `'b`, and `'c` is "fresh."
+    
+    Answer both parts:
+    
+    (a) Assume that `f` is bound in Γ to the type scheme `∀.'a × 'b → 'c.`
+        (The `∀` is supposed to be empty and the `×` separates distinct
+        arguments to the function.) 
+        In judgment C, Γ ⊢ e : τ, what does the type checker output for τ?
+
+        >
+
+        And what does the type checker output for C?
+
+        >
+
+    (b) Assume that `f` is bound in Γ to the type scheme `∀.'a`.
+        In judgment C, Γ ⊢ e : τ, what does the type checker output for τ?
+
+        >
+
+        And what does the type checker output for C?
+
+        >
+
+    _You are ready for some of the easier parts of exercise 3._
+
+For questions 6-7, read the paragraphs from the top of page 414 ("A function
+is well typed...") to the middle of page 415 that describe the nondeterministic
+typing rules for `lambda` and for "Milner's Let". The small paragraph following
+the `lambda` rule is particularly important for understanding notation. Note
+that although code chunk 414 defines a function called `too-polymorphic`, some
+references to that that function in this reading call it `too-poly`.
+
+ 6. Now look at the `val` definition of `too-polymorphic` in code chunk 414.
+    The right-hand side of the `val` definition is a `lambda`
+    expression with the name `empty-list` playing the role of `x₁`.
+    
+    (a) The rule for `lambda` says that we can pick any type `τ₁` for
+        `empty-list`.  After we've chosen `τ₁`, what is the *type
+        scheme* to which `empty-list` (playing `x₁`) is bound in the
+        extended environment which is used to check $e$?
+        (Hint: this type scheme comes from the `lambda` rule,
+        as per the discussion in the small paragraph, and it is
+        *different* from the type scheme of the `empty-list` that
+        appears in the top-level `val` binding.)
+        
+
+        >
+
+
+    (b) Given that the rule for `lambda` says that we can pick any
+        type `τ₁` for `empty-list`, why can't we pick a `τ₁` that makes
+        the `lambda` expression in too-polymorphic type-check?  
+        Put the word YES next to the best explanation:
+
+          - Parameter `empty-list` has to have type `(forall ('a)
+            (list 'a))`, but `τ₁` is not a `forall` type.
+
+          - Parameter `empty-list` has type `τ₁` = `(list 'a)`, which is
+            not the same as `(list bool)`.
+
+          - Parameter `empty-list` can have any type `τ₁` but no `τ₁` can
+            be equivalent to both `(list int)` and `(list bool)`.
+
+          - Parameter `empty-list` has type `τ₁` = `(list bool)`, which
+            is not the same as `(list int)`.
+
+          - Parameter `empty-list` has type `τ₁` = `(list int)`, which
+            is not the same as `(list bool)`.
+
+
+
+    _You are ready for exercise 1 and for one of the hard parts of exercise 3._
+
+ 7. Now look at the definition of `not-too-polymorphic` in code chunk 415.
+    The right-hand side is an example of Milner's `let` with
+    `empty-list` playing the role of $x$, the literal `'()` playing
+    the role of $e'$, and an application of `pair` playing the role
+    of $e$.  Suppose that Γ ⊢ `'()` : β list, where β is a type variable
+    that does not appear anywhere in Γ.  That is to say, the literal
+    `'()` is given the type β list, which is playing the role of τ'.
+
+    (a) If τ' is β list, what are its free type variables?
+
+        >
+
+
+    b) What set in this example plays the role of `{ α₁, ..., αₙ }` in Milner's
+        Let, which is ftv(τ')-ftv(Γ)?
+
+        >
+    
+
+    (c) What is the *type scheme* to which `empty-list` (playing x) is 
+        bound in the extended environment which is used to check $e$?
+
+        >
+
+
+    _You are ready for all of exercise 3._
+
+

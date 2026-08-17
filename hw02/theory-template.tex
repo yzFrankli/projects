@@ -1,0 +1,54 @@
+\documentclass[11pt]{article}
+
+
+\usepackage{alltt}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{qtree}
+\usepackage{semantic}
+\usepackage{mathpartir}
+
+\newcommand{\br}[1]{\langle #1 \rangle}
+\newcommand{\state}[4]{\langle {#1,#2,#3,#4} \rangle}
+\newcommand{\evalr}[2][{}]{\state{#2}{\xi#1}{\phi}{\rho#1}}
+
+
+
+
+\begin{document}
+
+\parskip=0.8\baselineskip plus 2pt
+\parindent=0pt
+
+Here are some examples of LaTeX commands that could help you on the opsem
+assignment.
+
+Verbatim code: \verb|(if x 2 3)|
+
+Another way to put text in code font: \texttt{x}.
+
+Putting text in the font to name rules: \textsc{IfFalse}.
+
+Here is an example of two rules appearing one over the other:
+
+\begin{mathpar}
+\inferrule*[Right=\textsc{Literal}]
+          {\ }
+          {\evalr{\textsc{literal}(v)}
+               \Downarrow
+           \state{v}{\xi}{\phi}{\rho}}
+\end{mathpar}
+\begin{mathpar}
+\inferrule*[Right=\textsc{FormalVar}]
+          {x \in \text{dom } \rho}
+           {\evalr{\textsc{var}(x)}
+                \Downarrow
+            \state{\rho(x)}{\xi}{\phi}{\rho}}
+\end{mathpar}
+
+
+
+
+
+\end{document}
