@@ -117,7 +117,7 @@ Low-level programming projects exploring assembly, computation, and machine-leve
 
 ---
 
-## 🧠 What I've Learned
+## What I've Learned
 
 These projects represent different stages of my development as a programmer. Through them, I've worked with:
 
@@ -134,13 +134,13 @@ These projects represent different stages of my development as a programmer. Thr
 * **Programming language design**
 * **Computer architecture**
 
-## 🛠️ Languages
+## Languages
 
 Throughout these projects, I've worked with:
 
 `C` · `C++` · `Java` · `JavaScript` · `Python` · `Lisp` · `Scheme` · `HTML` · `uMasm`
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 projects/
@@ -185,7 +185,7 @@ projects/
     └── calculator/
 ```
 
-## 🚀 Why This Repository Exists
+## Why This Repository Exists
 
 Rather than keeping my projects scattered across different repositories, I created this collection to document my progression as a programmer.
 
@@ -193,7 +193,7 @@ Some projects are small exercises designed to teach a specific concept, while ot
 
 > From learning the fundamentals of programming to building systems involving networking, concurrency, security, and software architecture, these projects represent my growth as a developer.
 
-## 🔗 More Projects
+## More Projects
 
 For my more recent and larger projects, check out my other repositories and my portfolio [here](https://github.com/yzFrankli).
 
