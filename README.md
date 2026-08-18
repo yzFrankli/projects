@@ -3,7 +3,7 @@ A collection of projects I've developed throughout my programming journey, showc
 
 The projects are organized by their **primary programming language**, reflecting the different languages, concepts, and technologies I've explored along the way.
 
-## 📚 Projects by Language
+## Projects by Language
 
 ### C
 
