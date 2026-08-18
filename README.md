@@ -1,2 +1,7 @@
-# projects
-Different of projects I have worked on in my coding journey, grouped by the programming languages they use. 
+# Projects
+
+## About
+A collection of projects I've developed throughout my programming journey, showcasing my experience across different programming languages, frameworks, and technologies.
+
+
+
