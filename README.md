@@ -195,7 +195,7 @@ Some projects are small exercises designed to teach a specific concept, while ot
 
 ## 🔗 More Projects
 
-For my more recent and larger projects, check out my other repositories and my portfolio.
+For my more recent and larger projects, check out my other repositories and my portfolio [here](https://github.com/yzFrankli).
 
 ---
 
